@@ -13,8 +13,8 @@ participants_number = 30;
 
 for p_itr=1:participants_number
     %saved_fname=sprintf('individual/saved/p%d.mat',hyper_p); %
-    saved_fname=sprintf('modeling/individual/estimated_params_%s_%s/p%d.mat',exp_type, model_type, p_itr);  % for GA
-    load(saved_fname)
+    load_fname=sprintf('modeling/individual/estimated_params_%s_%s/p%d.mat',exp_type, model_type, p_itr);  % for GA
+    load(load_fname)
     
     
     cdf_file_name_ind = sprintf('exp_data/individual/exp_cdf/cdf_%s_%d.csv', exp_type, p_itr);
@@ -49,7 +49,6 @@ exp_CAF = reshape(nanmean(exp_CAF_individual),9,5); % average over participants
 model_CDF = reshape(nanmean(model_CDF_individual),9,5); % average over participants
 model_CAF = reshape(nanmean(model_CAF_individual),9,5); % average over participants
 
-% expCDFTotal_new_vals = zeros(length(valid_persons),9,5);
 for p_itr=1:participants_number
     for point_cnt = 1:5
         expCDFTotal_new_vals(p_itr, :, point_cnt) = exp_CDF_individual(p_itr,:,point_cnt) - nanmean(exp_CDF_individual(p_itr, :, point_cnt)) + nanmean(nanmean(exp_CDF_individual(:,:,point_cnt)));
@@ -85,7 +84,7 @@ for p_itr=1:participants_number
             modelCDFIndividual_new_vals(p_itr,4,point_cnt), ...
             modelCDFIndividual_new_vals(p_itr,1,point_cnt)]);
         
-        delta_tactile(p_itr,point_cnt) = mean([modelCDFIndividual_new_vals(p_itr,7,point_cnt), ...
+        delta_tac_aud(p_itr,point_cnt) = mean([modelCDFIndividual_new_vals(p_itr,7,point_cnt), ...
             modelCDFIndividual_new_vals(p_itr,8,point_cnt), ...
             modelCDFIndividual_new_vals(p_itr,9,point_cnt)]) - ...
             mean([modelCDFIndividual_new_vals(p_itr,1,point_cnt), ...
@@ -112,8 +111,8 @@ model_delta_x_vector_tac =  nanmean([reshape(nanmean(modelCDFIndividual_new_vals
     reshape(nanmean(modelCDFIndividual_new_vals(:,3,:)),1,5)]);
 
 
-model_delta_mean_tac = nanmean(delta_tactile);
-model_delta_err_tac  = (nanstd(delta_tactile)./sqrt(participants_number)).*corr_factor;
+model_delta_mean_tac = nanmean(delta_tac_aud);
+model_delta_err_tac  = (nanstd(delta_tac_aud)./sqrt(participants_number)).*corr_factor;
 
 figure;
 errorbar(model_delta_x_vector_tac, model_delta_mean_tac,model_delta_err_tac,'--ok','vertical','linewidth',2);
