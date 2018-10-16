@@ -1,4 +1,4 @@
-
+% VALUES ARE OLD IN THIS SCRIPT
 clear
 close all
 
