@@ -4,7 +4,7 @@ close all
 
 
 % PLEASE SELECT THE EXPERIMENT HERE: 'VT' or 'VA'
-exp_type = 'VA';
+exp_type = 'VT';
 model_type = 'fn_mdmc'; % 'mdmc' or 'fn_mdmc'
 
 
@@ -20,14 +20,14 @@ for p_itr=1:participants_number
     cdf_file_name_ind = sprintf('exp_data/individual/exp_cdf/cdf_%s_%d.csv', exp_type, p_itr);
     caf_file_name_ind = sprintf('exp_data/individual/exp_caf/caf_%s_%d.csv', exp_type, p_itr);
    
-    exp_CDF_individual = csvread(cdf_file_name_ind);
-    exp_CAF_individual = csvread(caf_file_name_ind);
+    exp_CDF = csvread(cdf_file_name_ind);
+    exp_CAF = csvread(caf_file_name_ind);
     
-    exp_CDF_total(p_itr,1:9,1:5) = exp_CDF_individual;
-    exp_CAF_total(p_itr,:,:) = exp_CAF_individual;
+    exp_CDF_individual(p_itr,:,:) = exp_CDF;
+    exp_CAF_individual(p_itr,:,:) = exp_CAF;
     [vs,indices ] = sort(fvals);
     xss=indices(1);
-    x = Xs(1,:);
+    x = Xs(xss,:);
     
     if strcmp(model_type, 'mdmc')
         [RTS, CTS, ICTS] = model_mdmc(x, no_runs_per_itr);
@@ -43,8 +43,8 @@ end
 
 %% plotting and postprocessing
 clear exp_CAF exp_CAF model_CDF model_CAF
-exp_CDF = reshape(nanmean(exp_CDF_total),9,5); % average over participants
-exp_CAF = reshape(nanmean(exp_CAF_total),9,5); % average over participants
+exp_CDF = reshape(nanmean(exp_CDF_individual),9,5); % average over participants
+exp_CAF = reshape(nanmean(exp_CAF_individual),9,5); % average over participants
 
 model_CDF = reshape(nanmean(model_CDF_individual),9,5); % average over participants
 model_CAF = reshape(nanmean(model_CAF_individual),9,5); % average over participants
@@ -52,8 +52,8 @@ model_CAF = reshape(nanmean(model_CAF_individual),9,5); % average over participa
 % expCDFTotal_new_vals = zeros(length(valid_persons),9,5);
 for p_itr=1:participants_number
     for point_cnt = 1:5
-        expCDFTotal_new_vals(p_itr, :, point_cnt) = exp_CDF_total(p_itr,:,point_cnt) - nanmean(exp_CDF_total(p_itr, :, point_cnt)) + nanmean(nanmean(exp_CDF_total(:,:,point_cnt)));
-        expCAFTotal_new_vals(p_itr, :, point_cnt) = exp_CAF_total(p_itr,:,point_cnt) - nanmean(exp_CAF_total(p_itr, :, point_cnt)) + nanmean(nanmean(exp_CAF_total(:,:,point_cnt)));
+        expCDFTotal_new_vals(p_itr, :, point_cnt) = exp_CDF_individual(p_itr,:,point_cnt) - nanmean(exp_CDF_individual(p_itr, :, point_cnt)) + nanmean(nanmean(exp_CDF_individual(:,:,point_cnt)));
+        expCAFTotal_new_vals(p_itr, :, point_cnt) = exp_CAF_individual(p_itr,:,point_cnt) - nanmean(exp_CAF_individual(p_itr, :, point_cnt)) + nanmean(nanmean(exp_CAF_individual(:,:,point_cnt)));
         
         modelCDFIndividual_new_vals(p_itr, :, point_cnt) = model_CDF_individual(p_itr,:,point_cnt) - nanmean(model_CDF_individual(p_itr, :, point_cnt)) + nanmean(nanmean(model_CDF_individual(:,:,point_cnt)));
         modelCAFIndividual_new_vals(p_itr, :, point_cnt) = model_CAF_individual(p_itr,:,point_cnt) - nanmean(model_CAF_individual(p_itr, :, point_cnt)) + nanmean(nanmean(model_CAF_individual(:,:,point_cnt)));
@@ -101,8 +101,7 @@ model_delta_x_vector_vis =  nanmean([reshape(nanmean(modelCDFIndividual_new_vals
     reshape(nanmean(modelCDFIndividual_new_vals(:,1,:)),1,5)]);
 
 model_delta_mean_vis = nanmean(delta_visual);
-% TODO: check if it should be *3 or just the number of participants
-model_delta_err_vis  = (nanstd(delta_visual)./sqrt(participants_number*3)).*corr_factor;
+model_delta_err_vis  = (nanstd(delta_visual)./sqrt(participants_number)).*corr_factor;
 
 figure;
 errorbar(model_delta_x_vector_vis, model_delta_mean_vis,model_delta_err_vis,'--ok','vertical','linewidth',2);
@@ -114,8 +113,7 @@ model_delta_x_vector_tac =  nanmean([reshape(nanmean(modelCDFIndividual_new_vals
 
 
 model_delta_mean_tac = nanmean(delta_tactile);
-% TODO: check if it should be *3 or just the number of participants
-model_delta_err_tac  = (nanstd(delta_tactile)./sqrt(participants_number*3)).*corr_factor;
+model_delta_err_tac  = (nanstd(delta_tactile)./sqrt(participants_number)).*corr_factor;
 
 figure;
 errorbar(model_delta_x_vector_tac, model_delta_mean_tac,model_delta_err_tac,'--ok','vertical','linewidth',2);
