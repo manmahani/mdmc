@@ -4,7 +4,7 @@ close all
 
 
 % PLEASE SELECT THE EXPERIMENT HERE: 'VT' or 'VA'
-exp_type = 'VT';
+exp_type = 'VA';
 model_type = 'fn_mdmc'; % 'mdmc' or 'fn_mdmc'
 
 
